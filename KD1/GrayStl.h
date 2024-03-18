@@ -98,8 +98,8 @@ struct BidirectionalListItem_iter {
 template <typename T>
 struct TreeItem {
 	T value;
-	TreeItem<T>* left;
-	TreeItem<T>* right;
+	TreeItem<T>* left = nullptr;
+	TreeItem<T>* right = nullptr;
 
 	int height = 0;
 };
@@ -139,8 +139,8 @@ template<> static int Compare<std::string>::compare(std::string val1, std::strin
 template <typename T>
 class OneDirectionalList {
 public:
-	OneDirectionalListItem<T>* start;
-	OneDirectionalListItem<T>* stop;
+	OneDirectionalListItem<T>* start = nullptr;
+	OneDirectionalListItem<T>* stop = nullptr;
 
 	OneDirectionalListItem_iter<T> begin()	{ return OneDirectionalListItem_iter<T>(start); }
 	OneDirectionalListItem_iter<T> end()	{ return OneDirectionalListItem_iter<T>(stop);	}
@@ -411,8 +411,8 @@ public:
 
 template <typename T>
 class BidirectionalList {
-	BidirectionalListItem<T>* start;
-	BidirectionalListItem<T>* stop;
+	BidirectionalListItem<T>* start = nullptr;
+	BidirectionalListItem<T>* stop = nullptr;
 
 public:
 	BidirectionalListItem_iter<T> begin() { return BidirectionalListItem_iter<T>(start); }
@@ -921,15 +921,15 @@ private:
 		switch (node->value[0])
 		{
 			case '+':
-				return left + right;
+				return (double)left + (double)right;
 			case '-':
-				return left - right;
+				return (double)left - (double)right;
 			case '/':
-				return left / right;
+				return (double)left / (double)right;
 			case '*':
-				return left * right;
+				return (double)left * (double)right;
 			case '^':
-				return std::pow(left, right);
+				return std::pow((double)left, (double)right);
 
 			default:
 				break;

@@ -8,7 +8,7 @@
 using namespace std;
 
 int main() {
-    Math* math = new Math("3+5*25+3");
+    Math math = Math("3+5*25+3");
 
-    cout << math->parse() << endl;
+    cout << math.parse() << endl;
 }
