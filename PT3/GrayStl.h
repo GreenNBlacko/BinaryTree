@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <cstddef>
 
 void getValue(int& value, std::string name) {
 	std::cout << "Enter " << name << ": ";
@@ -28,71 +29,125 @@ int selectionMenu(std::string prompt, std::string* options, int size) {
 }
 
 template <typename T>
-struct BidirectionalListItem {
+struct ListItem {
 	T value;
-	BidirectionalListItem<T>* prevValue;
-	BidirectionalListItem<T>* nextValue;
+	ListItem<T>* nextValue;
+
+	ListItem<T>(T _value) {
+		value = _value;
+		nextValue = nullptr;
+	}
 };
 
 template <typename T>
-struct OneDirectionalListItem {
-	T value;
-	OneDirectionalListItem<T>* nextValue;
-};
+struct List_iter {
+	ListItem<T>* current;
+	List_iter(ListItem<T>* current) : current(current) {}
 
-template <typename T>
-struct OneDirectionalListItem_iter {
-	OneDirectionalListItem<T>* current;
-	OneDirectionalListItem_iter(OneDirectionalListItem<T>* current) : current(current) {}
-
-	const OneDirectionalListItem_iter& operator++() { current = current->nextValue; return *this; }
-	OneDirectionalListItem_iter operator++(int) {
-		OneDirectionalListItem_iter result = *this; ++(*this); return result;
+	const List_iter& operator++() { current = current->nextValue; return *this; }
+	List_iter operator++(int) {
+		List_iter result = *this; ++(*this); return result;
 	}
 
-	OneDirectionalListItem_iter& operator+(int const& right) { 
+	List_iter operator+(int const right) {
 		for (int i = 0; i < right && current != nullptr; i++) {
-			current = current->nextValue; 
-		} 
+			current = current->nextValue;
+		}
 
-		return *this; 
+		return *this;
 	}
 
-	OneDirectionalListItem<T>* operator*() { return current; }
+	bool operator==(List_iter<T> right) {
+		return current == *right;
+	}
+
+	bool operator==(List_iter<T>* right) {
+		return current == right;
+	}
+
+	bool operator!=(List_iter<T> right) {
+		return !(this == right);
+	}
+
+	bool operator!=(List_iter<T>* right) {
+		return !(this == right);
+	}
+
+	T& operator*() const {
+		return current->value;
+	}
+
+	ListItem<T>* node() const {
+		return current;
+	}
 };
 
 template <typename T>
-struct BidirectionalListItem_iter {
-	BidirectionalListItem<T>* current;
-	BidirectionalListItem_iter(BidirectionalListItem<T>* current) : current(current) {}
+struct BiListItem {
+	T value;
+	BiListItem<T>* prevValue;
+	BiListItem<T>* nextValue;
 
-	const BidirectionalListItem_iter& operator++() { current = current->nextValue; return *this; }
-	BidirectionalListItem_iter operator++(int) {
-		BidirectionalListItem_iter result = *this; ++(*this); return result;
+	BiListItem<T>(T _value) {
+		value = _value;
+		prevValue = nextValue = nullptr;
+	}
+};
+
+template <typename T>
+struct BiList_iter {
+	BiListItem<T>* current;
+	BiList_iter(BiListItem<T>* current) : current(current) {}
+
+	const BiList_iter& operator++() { current = current->nextValue; return *this; }
+	BiList_iter operator++(int) {
+		BiList_iter result = *this; ++(*this); return result;
 	}
 
-	BidirectionalListItem_iter<T> operator+(int const& right) {
-		for (int i = 0; i < right && current != nullptr; i++) { 
-			current = current->nextValue; 
-		} 
+	BiList_iter<T> operator+(int const& right) {
+		for (int i = 0; i < right && current != nullptr; i++) {
+			current = current->nextValue;
+		}
 
-		return *this; 
+		return *this;
 	}
 
-	const BidirectionalListItem_iter& operator--() { current = current->prevValue; return *this; }
-	BidirectionalListItem_iter operator--(int) {
-		BidirectionalListItem_iter result = *this; --(*this); return result;
+	const BiList_iter& operator--() { current = current->prevValue; return *this; }
+	BiList_iter operator--(int) {
+		BiList_iter result = *this; --(*this); return result;
 	}
 
-	BidirectionalListItem_iter<T> operator-(int const& right) {
-		for (int i = 0; i < right && current != nullptr; i++) { 
-			current = current->prevValue; 
-		} 
+	BiList_iter<T> operator-(int const& right) {
+		for (int i = 0; i < right && current != nullptr; i++) {
+			current = current->prevValue;
+		}
 
-		return *this; 
+		return *this;
 	}
 
-	BidirectionalListItem<T>* operator*() { return current; }
+	bool operator==(BiList_iter<T> right) {
+		return current == right.node();
+	}
+
+	bool operator==(BiListItem<T>* right) {
+		return current == right;
+	}
+
+	bool operator!=(BiList_iter<T> right) {
+		return !(this == right);
+	}
+
+	bool operator!=(BiListItem<T>* right) {
+		return !(current == right);
+	}
+
+	T& operator*() const {
+		return current->value;
+	}
+
+	BiListItem<T>* node() const {
+		return current;
+	}
 };
 
 template <typename T>
@@ -108,63 +163,258 @@ template <typename T>
 class Compare {
 public:
 	static int compare(T val1, T val2) {
-		return 0;
+		return (val1 == val2 ? 0 :
+			(val1 > val2 ? -1 : 1));
 	}
 };
-
-template<> static int Compare<int>::compare(int val1, int val2) {
-	return (val1 == val2 ? 0 :
-		(val1 > val2 ? -1 : 1));
-}
-
-template<> static int Compare<char>::compare(char val1, char val2) {
-	return (val1 == val2 ? 0 :
-		(val1 > val2 ? -1 : 1));
-}
-
-template<> static int Compare<double>::compare(double val1, double val2) {
-	return (val1 == val2 ? 0 :
-		(val1 > val2 ? -1 : 1));
-}
-
-template<> static int Compare<float>::compare(float val1, float val2) {
-	return (val1 == val2 ? 0 :
-		(val1 > val2 ? -1 : 1));
-}
 
 template<> static int Compare<std::string>::compare(std::string val1, std::string val2) {
 	return val1.compare(val2);
 }
 
-template <typename T>
-class OneDirectionalList {
-public:
-	OneDirectionalListItem<T>* start = nullptr;
-	OneDirectionalListItem<T>* stop = nullptr;
+// ------------------- TYPE DECLARATIONS ------------------- \\
 
-	OneDirectionalListItem_iter<T> begin()	{ return OneDirectionalListItem_iter<T>(start); }
-	OneDirectionalListItem_iter<T> end()	{ return OneDirectionalListItem_iter<T>(stop);	}
+template<typename T>
+class Sortable;
+
+template <typename T>
+class List;
+
+template <typename T>
+class CyclicList;
+
+template <typename T>
+class Stack;
+
+template <typename T>
+class Queue;
+
+template <typename T>
+class BiList;
+
+template <typename T>
+class DeQueue;
+
+// ------------------- TYPE DECLARATIONS ------------------- \\
+
+template<typename T>
+class Sortable {
+public:
+	virtual std::size_t size() = 0;
+
+	virtual T& operator[](int index) = 0;
+
+	void insertionSort() {
+		for (int i = 1; i < size(); i++) {
+			if (Compare<T>::compare((*this)[i], (*this)[i - 1]) == 1) {
+				for (int o = 0; o < i; o++) {
+					if (Compare<T>::compare((*this)[i], (*this)[o]) == 1) {
+						T temp = (*this)[o];
+
+						(*this)[o] = (*this)[i];
+						(*this)[i] = temp;
+					}
+				}
+			}
+		}
+	}
+
+	void mergeSort() {
+		bool set = false;
+
+		for (int i = 0; i < size(); i++) { // dumb check, if array is sorted, no need to sort it again, save processing power
+			if (i == size() - 1 && !set) // if we've gone through the whole array and not found a single issue, no need to sort, exit out of the function
+				return;
+
+			if (Compare<T>::compare((*this)[i], (*this)[i + 1]) == -1) // if an element is found out of place, commence setting the flag
+				set = true;
+
+			if (set) // if flag is set, stop the loop and proceed with sorting the list
+				break;
+		}
+
+		List<List<T>> split;
+		split.assign(1, List<T>(size(), 0)); // initializing the split list
+
+		for (int i = 0; i < size(); i++) {
+			split[0][i] = (*this)[i];
+		}
+
+		for (int n = (*this).size() / 2; n >= 1; n /= 2) { // incrementally increasing the number of split elements
+			int subSplitSize = (*this).size() / n;
+
+			List<List<T>> newSplit;
+			for (int i = 0; i < n; i++)
+				newSplit.push_back(List<T>(subSplitSize, T()));
+
+			for (int i = 0; i < n; i++) {
+				int lastLowest = -1; // by default when the cycle begins, there is no last lowest element
+
+				for (int o = 0; o < subSplitSize; o++) {
+					int currentLowest = subSplitSize * i;
+
+					for (int p = i * subSplitSize; p < (subSplitSize + subSplitSize * i) % ((i + 1) * subSplitSize + 1); p++) { // find the smallest element to put into the position
+						if (p == lastLowest || p == currentLowest) // skip the value if it has already been used or is currently contending to be used
+							continue;
+
+						// the reason for different lists is we cannot be sure of which list the element will be in, and not figuring that out could lead to garbage in garbage out
+						int currentLowestList = (currentLowest / split[0].size());
+						int lastLowestList = lastLowest != -1 ? (lastLowest / split[0].size()) : 0;
+						int list = (p / split[0].size());
+
+						// store the values to compact down the if statement below
+						T currentLowestVal = split[currentLowestList][currentLowest % split[0].size()];
+						T lastLowestVal = split[lastLowestList][lastLowest % split[0].size()];
+						T currentVal = split[list][p % split[0].size()];
+						T lastVal = o > 0 ? newSplit[i][o - 1] : NULL; // if it's the first element in the sub split, there is no last value, therefor attributed to null
+
+						if (currentVal == lastVal) { // print repeating values
+							split[lastLowestList][lastLowest % split[0].size()] = newSplit[0][0];
+
+							currentLowest = p;
+
+							break;
+						}
+
+						// if the last lowest element exists and is bigger or equal to the current lowest or the current value is less than the current lowest value
+						// and it is currently trying to insert into the first sub split element or the current value is more or equal to the last value 
+						if ((lastLowest != -1 && currentLowestVal <= lastLowestVal || currentVal < currentLowestVal) && (o == 0 || currentVal >= lastVal))
+							currentLowest = p; // set the lowest element to the current element																									   
+					}
+
+					int insertList = (currentLowest / split[0].size()); // get the list which to insert from 
+
+					newSplit[i][o] = split[insertList][currentLowest % split[0].size()]; // insert the value into the new sub split
+
+					lastLowest = currentLowest; // set the current lowest value to the last for the next cycle
+				}
+			}
+
+			split = newSplit; // assign the just created split to be merged further
+		}
+
+		for (int i = 0; i < size(); i++) {
+			(*this)[i] = split[0][i];
+		}
+	}
+
+	void quicksort() {
+		quicksort(0, size() - 1);
+	}
+
+	void quicksort(int low, int high) {
+		if (low < high) {
+			int pi = partition(low, high);
+
+			quicksort(low, pi - 1);
+			quicksort(pi + 1, high);
+		}
+	}
+
+private:
+	int partition(int low, int high) {
+		T pivot = (*this)[high]; // Choose the last element as the pivot
+		int i = low - 1; // Index of the smaller element
+
+		for (int j = low; j < high; j++) {
+			if ((*this)[j] < pivot) {
+				i++;
+				T temp = (*this)[i];
+				(*this)[i] = (*this)[j];
+				(*this)[j] = temp;
+			}
+		}
+
+		T temp = (*this)[i + 1];
+		(*this)[i + 1] = (*this)[high];
+		(*this)[high] = temp;
+		return i + 1;
+	}
+};
+
+template <typename T>
+class List : public Sortable<T> {
+	std::size_t _size = 0;
+
+public:
+	ListItem<T>* start = nullptr;
+	ListItem<T>* stop = nullptr;
+
+	List() {
+		_size = 0;
+	}
+
+	List(int capacity) {
+		assign(capacity, T());
+	}
+
+	List(int capacity, T value) {
+		assign(capacity, value);
+	}
+
+	bool empty() const { return _size == 0; }
+
+	virtual std::size_t size() override { return _size; }
+
+	List_iter<T> begin() { return List_iter<T>(start); }
+	List_iter<T> end() { return List_iter<T>(stop); }
 
 	T elementAt(int index) {
-		OneDirectionalListItem<T>* current = start;
+		if (empty())
+			throw std::out_of_range("Index out of bounds");
 
-		if (current == nullptr)
-			throw "Index out of bounds";
+		ListItem<T>* current = start;
 
 		for (int i = 0; i < index; i++) {
 			current = current->nextValue;
 
 			if (current == nullptr)
-				throw "Index out of bounds";
+				throw std::out_of_range("Index out of bounds");
 		}
 
 		return current->value;
 	}
 
-	void insertAtStart(T value) {
-		OneDirectionalListItem<T>* newValue = new OneDirectionalListItem<T>();
+	int indexOf(T value) {
+		int i = 0;
 
-		newValue->value = value;
+		for (i = 0; i < _size && (*this)[i] != value; i++) {}
+
+		if ((*this)[i] != value)
+			return -1;
+
+		return i;
+	}
+
+	T max() {
+		if (empty())
+			throw std::out_of_range("List is empty");
+
+		T maxValue = (*this)[0];
+
+		for (int i = 1; i < _size; i++) {
+			maxValue = (Compare<T>::compare(maxValue, (*this)[i]) == -1 ? maxValue : (*this)[i]);
+		}
+
+		return maxValue;
+	}
+
+	T min() {
+		if (empty())
+			throw std::out_of_range("List is empty");
+
+		T minValue = (*this)[0];
+
+		for (int i = 1; i < _size; i++) {
+			minValue = (Compare<T>::compare(minValue, (*this)[i]) == 1 ? minValue : (*this)[i]);
+		}
+
+		return minValue;
+	}
+
+	void push_front(T value) {
+		ListItem<T>* newValue = new ListItem<T>(value);
+
 		newValue->nextValue = start;
 		start = newValue;
 
@@ -172,432 +422,669 @@ public:
 		start = newValue;
 		if (stop == nullptr)
 			stop = newValue;
+
+		_size++;
 	}
 
-	void insertAt(int index, T value) {
-		OneDirectionalListItem<T>* current = start;
-
-		if (current == nullptr)
-			throw "Index out of bounds";
-
-		for (int i = 0; i < index; i++) {
-			current = current->nextValue;
-
-			if (current == nullptr)
-				throw "Index out of bounds";
-		}
+	void insert(int index, T value) {
+		ListItem<T>* current = (begin() + index).node();
 
 		if (current == start) {
-			insertAtStart(value);
+			push_front(value);
 			return;
 		}
 		else if (current == stop) {
-			insertAtEnd(value);
+			push_back(value);
 			return;
 		}
 
-		OneDirectionalListItem<T>* newItem = new OneDirectionalListItem<T>();
+		ListItem<T>* newItem = new ListItem<T>(value);
 
-		newItem->value = value;
 		newItem->nextValue = current->nextValue;
 		current->nextValue = newItem;
+
+		_size++;
 	}
 
-	void insertAtEnd(T value) {
-		OneDirectionalListItem<T>* newValue = new OneDirectionalListItem<T>();
+	void push_back(T value) {
+		ListItem<T>* newValue = new ListItem<T>(value);
 
-		newValue->value = value;
 		if (stop != nullptr) stop->nextValue = newValue;
 
 		if (start == nullptr)
 			start = newValue;
 		stop = newValue;
+
+		_size++;
 	}
 
-	void removeFromStart() {
-		if (start == nullptr)
-			return;
+	void pop_front() {
+		if (empty())
+			throw std::out_of_range("List is empty");
 
-		OneDirectionalListItem<T>* old = start;
+		ListItem<T>* old = start;
 
 		start = old->nextValue;
 
 		free(old);
+
+		_size--;
 	}
 
-	void removeAt(int index) {
-		OneDirectionalListItem<T>* current = start;
-
-		if (current == nullptr)
-			throw "Index out of bounds";
-
-		for (int i = 0; i < index - 2; i++) {
-			current = current->nextValue;
-
-			if (current == nullptr)
-				throw "Index out of bounds";
-		}
+	void remove(int index) {
+		ListItem<T>* current = (begin() + index).node();
 
 		if (current == start) {
-			removeFromStart();
+			pop_front();
 
 			return;
 		}
+
+		if (current == stop)
+			throw std::out_of_range("Index out of range");
 
 		if (current->nextValue == stop) {
 			stop = current;
 		}
 
-		OneDirectionalListItem<T>* temp = current->nextValue;
+		ListItem<T>* temp = current->nextValue;
 		current->nextValue = temp->nextValue;
+		current->value = temp->value;
 
 		free(temp);
+
+		_size--;
 	}
 
 	void display() {
-		OneDirectionalListItem_iter<T> current = begin();
-
-		while (*current != nullptr) {
-			std::cout << *current->value << " ";
-			current++;
-		}
+		for (int i = 0; i < _size; i++)
+			std::cout << (*this)[i] << " ";
 
 		std::cout << std::endl;
+	}
+
+	void assign(int capacity, T value) {
+		for (int i = 0; i < capacity; i++)
+			push_back(std::move(value));
+	}
+
+	void clear() {
+		while (!empty())
+			pop_front();
+	}
+
+	virtual T& operator[](int index) override {
+		ListItem<T>* temp = start;
+		for (int i = 0; i < index && temp != nullptr; i++) {
+			temp = temp->nextValue;
+		}
+		if (temp == nullptr) {
+			throw std::out_of_range("Index out of range");
+		}
+		return temp->value;
 	}
 };
 
 template <typename T>
-class CyclicList {
-private: 
-	OneDirectionalList<T> list{};
+class CyclicList : public Sortable<T> {
+private:
+	List<T> list = List<T>();
 
 
 public:
-	OneDirectionalListItem_iter<T> begin() { return list.begin(); }
-	OneDirectionalListItem_iter<T> end() { return list.end(); }
+	CyclicList() {
+		list = List<T>(0);
+	}
+
+	CyclicList(int capacity) {
+		list = List<T>(capacity);
+	}
+
+	CyclicList(int capacity, T value) {
+		list = List<T>(capacity, value);
+	}
+
+	bool empty() const { return list.empty(); }
+
+	virtual std::size_t size() override { return list.size(); }
+
+	List_iter<T> begin() { return list.begin(); }
+	List_iter<T> end() { return list.end(); }
+
+	int indexOf(T value) {
+		return list.indexOf(value);
+	}
 
 	T elementAt(int index) {
 		return list.elementAt(index);
 	}
 
-	void insertAtStart(T value) {
-		list.insertAtStart(value);
+	void push_front(T value) {
+		list.push_front(value);
 
 		if (list.stop != nullptr)
 			list.stop->nextValue = list.start;
 	}
 
-	void insertAt(int index, T value) {
-		list.insertAt(index, value);
+	void insert(int index, T value) {
+		list.insert(index, value);
 	}
 
-	void insertAtEnd(T value) {
-		list.insertAtEnd(value);
+	void push_back(T value) {
+		list.push_back(value);
 
 		if (list.stop != nullptr)
 			list.stop->nextValue = list.start;
 	}
 
-	void removeFromStart() {
-		list.removeFromStart();
+	void pop_front() {
+		list.pop_front();
 
 		if (list.stop != nullptr)
 			list.stop->nextValue = list.start;
 	}
 
-	void removeAt(int index) {
-		list.removeAt(index);
+	void remove(int index) {
+		list.remove(index);
+	}
+
+	T max() {
+		return list.max();
+	}
+
+	T min() {
+		return list.min();
 	}
 
 	void display() {
-		OneDirectionalListItem_iter<T> current = begin();
+		return list.display();
+	}
 
-		while (*current != list.stop) {
-			std::cout << (*current)->value << " ";
-			current++;
-		}
-
-		std::cout << (*current)->value << " ";
+	void display(int startIndex) {
+		for (int i = startIndex; i < size(); i++)
+			std::cout << (*this)[i] << " ";
 
 		std::cout << std::endl;
+	}
+
+	void assign(int capacity, T value) {
+		for (int i = 0; i < capacity; i++)
+			push_back(std::move(value));
+	}
+
+	void clear() {
+		while (!empty())
+			pop_front();
+	}
+
+	virtual Sortable<T> copy() override {
+		CyclicList<T> t = CyclicList<T>();
+
+		for (int i = 0; i < size(); i++) {
+			t.push_back(std::move(list[i]));
+		}
+
+		return t;
+	}
+
+	virtual T& operator[](int index) override {
+		return list[index];
 	}
 };
 
 template <typename T>
-class Stack {
-	OneDirectionalListItem<T>* head;
+class Stack : public Sortable<T> {
+	std::size_t _size = 0;
+
+public:
+	ListItem<T>* _head;
+
+	Stack() {
+		_size = 0;
+	}
+
+	Stack(int capacity) {
+		_size = 0;
+
+		for (int i = 0; i < capacity; i++)
+			push(T());
+	}
+
+	Stack(int capacity, T value) {
+		assign(capacity, value);
+	}
+
+	List_iter<T> head() { return List_iter<T>(_head); }
+
+	bool empty() const { return _size == 0; }
+
+	virtual std::size_t size() override { return _size; }
 
 	void push(T value) {
-		OneDirectionalListItem<T>* newValue = new OneDirectionalListItem<T>();
+		ListItem<T>* newValue = new ListItem<T>(value);
 
-		newValue->value = value;
-		newValue->nextValue = head;
-		head = newValue;
+		if (_head != nullptr)
+			newValue->nextValue = _head;
+		_head = newValue;
+
+		_size++;
 	}
 
 	T pop() {
-		if (head == nullptr)
-			throw "Stack is empty";
+		if (empty())
+			throw std::out_of_range("Stack is empty");
 
-		OneDirectionalListItem<T>* old = head;
+		ListItem<T>* old = _head;
 		T value = old->value;
 
-		head = old->nextValue;
+		_head = old->nextValue;
 
 		free(old);
+
+		_size--;
 
 		return value;
 	}
 
 	void display() {
-		OneDirectionalListItem<T>* current = head;
-
-		while (current != nullptr) {
-			std::cout << current->value << " ";
-			current = current->nextValue;
-		}
+		for (int i = 0; i < _size; i++)
+			std::cout << (*this)[i] << " ";
 
 		std::cout << std::endl;
+	}
+
+	void assign(int capacity, T value) {
+		for (int i = 0; i < capacity; i++)
+			push(std::move(value));
+	}
+
+	void clear() {
+		while (!empty())
+			pop();
+	}
+
+	virtual T& operator[](int index) override {
+		ListItem<T>* temp = _head;
+		for (int i = 0; i < index && temp != nullptr; i++) {
+			temp = temp->nextValue;
+		}
+		if (temp == nullptr) {
+			throw std::out_of_range("Index out of range");
+		}
+		return temp->value;
 	}
 };
 
 template <typename T>
-class Queue {
-public:
-	OneDirectionalListItem<T>* start;
-	OneDirectionalListItem<T>* end;
-	int size;
+class Queue : public Sortable<T> {
+	std::size_t _size;
 
-	void InsertValue(T value) {
-		OneDirectionalListItem<T>* newValue = new OneDirectionalListItem<T>();
+public:
+	ListItem<T>* start;
+	ListItem<T>* stop;
+
+	Queue() {
+		_size = 0;
+	}
+
+	Queue(int capacity) {
+		for (int i = 0; i < capacity; i++)
+			push(T());
+	}
+
+	Queue(int capacity, T value) {
+		assign(capacity, value);
+	}
+
+	List_iter<T> begin() { return List_iter<T>(start); }
+	List_iter<T> end() { return List_iter<T>(stop); }
+
+	bool empty() const { return _size == 0; }
+
+	virtual std::size_t size() override { return _size; }
+
+	void push(T value) {
+		ListItem<T>* newValue = new ListItem<T>();
 
 		newValue->value = value;
 		if (end != nullptr) end->nextValue = newValue;
 
-		if (size == 0)
+		if (empty())
 			start = newValue;
 		end = newValue;
 
-		size++;
+		_size++;
 	}
 
-	T ShiftValue() {
-		if (size == 0)
-			return "";
+	T shift() {
+		if (empty())
+			throw std::out_of_range("Queue is empty");
 
-		OneDirectionalListItem<T>* old = start;
+		ListItem<T>* old = start;
 		T value = old->value;
 
 		start = old->nextValue;
 
 		free(old);
 
-		size--;
+		_size--;
 
 		return value;
 	}
 
 	void display() {
-		OneDirectionalListItem<T>* current = start;
-
-		while (current != nullptr) {
-			std::cout << current->value << " ";
-			current = current->nextValue;
-		}
+		for (int i = 0; i < _size; i++)
+			std::cout << (*this)[i] << " ";
 
 		std::cout << std::endl;
+	}
+
+	void assign(int capacity, T value) {
+		for (int i = 0; i < capacity; i++)
+			push(std::move(value));
+	}
+
+	void clear() {
+		while (!empty())
+			shift();
+	}
+
+	virtual T& operator[](int index) override {
+		ListItem<T>* temp = start;
+		for (int i = 0; i < index && temp != nullptr; i++) {
+			temp = temp->nextValue;
+		}
+		if (temp == nullptr) {
+			throw std::out_of_range("Index out of range");
+		}
+		return temp->value;
 	}
 };
 
 template <typename T>
-class BidirectionalList {
-	BidirectionalListItem<T>* start = nullptr;
-	BidirectionalListItem<T>* stop = nullptr;
+class BiList : public Sortable<T> {
+	BiListItem<T>* start = nullptr;
+	BiListItem<T>* stop = nullptr;
+
+	std::size_t _size = 0;
 
 public:
-	BidirectionalListItem_iter<T> begin() { return BidirectionalListItem_iter<T>(start); }
-	BidirectionalListItem_iter<T> end() { return BidirectionalListItem_iter<T>(stop); }
+	BiList() {
+		_size = 0;
+	}
 
-	void InsertIntoStart(T value) {
-		BidirectionalListItem<T>* newValue = CreateElement(value);
+	BiList(int capacity) {
+		for (int i = 0; i < capacity; i++)
+			push_back(T());
+	}
+
+	BiList(int capacity, T value) {
+		assign(capacity, value);
+	}
+
+	bool empty() const { return _size == 0; }
+
+	virtual std::size_t size() override { return _size; }
+
+	BiList_iter<T> begin() { return BiList_iter<T>(start); }
+	BiList_iter<T> end() { return BiList_iter<T>(stop); }
+
+	int indexOf(T value) {
+		if (empty())
+			return -1;
+
+		int i = 0;
+
+		for (i = 0; i < _size; i++) { if ((*this)[i] == value) break; }
+
+		if (i == _size)
+			return -1;
+
+		return i;
+	}
+
+	void push_front(T value) {
+		BiListItem<T>* newValue = new BiListItem<T>(value);
 
 		if (start == nullptr) {
 			start = stop = newValue;
+
+			_size++;
+
 			return;
 		}
 
 		newValue->nextValue = start;
 		start->prevValue = newValue;
 		start = newValue;
+
+		_size++;
 	}
 
-	void insertAt(int index, T value) {
-		BidirectionalListItem_iter<T> it = begin();
+	void insert(int index, T value) {
+		BiList_iter<T> it = begin() + index;
 
-		if (*it == nullptr)
-			throw "Index out of bounds";
-
-		for (int i = 0; i < index; i++) {
-			it++;
-
-			if (*it == nullptr)
-				throw "Index out of bounds";
-		}
-
-		if (*it == start) {
-			InsertIntoStart(value);
+		if (it == start) {
+			push_front(value);
 			return;
 		}
-		else if (*it == stop) {
-			InsertIntoEnd(value);
+		else if (it == stop) {
+			push_back(value);
 			return;
 		}
 
-		BidirectionalListItem<T>* current = *it;
-		BidirectionalListItem<T>* newItem = new BidirectionalListItem<T>();
+		BiListItem<T>* current = it.node();
+		BiListItem<T>* newValue = new BiListItem<T>(value);
 
-		newItem->value = value;
-		newItem->nextValue = current->nextValue;
-		newItem->prevValue = current;
-		current->nextValue->prevValue = newItem;
-		current->nextValue = newItem;
+		newValue->nextValue = current->nextValue;
+		newValue->prevValue = current;
+		current->nextValue->prevValue = newValue;
+		current->nextValue = newValue;
+
+		_size++;
 	}
 
-	void InsertIntoEnd(T value) {
-		BidirectionalListItem<T>* newValue = CreateElement(value);
+	void push_back(T value) {
+		BiListItem<T>* newValue = new BiListItem<T>(value);
 
 		if (stop == nullptr) {
 			start = stop = newValue;
+
+			_size++;
 			return;
 		}
 
 		newValue->prevValue = stop;
 		stop->nextValue = newValue;
 		stop = newValue;
+
+		_size++;
 	}
 
-	void RemoveFromStart() {
-		if (start == nullptr)
-			throw "List is empty";
+	void pop_front() {
+		if (empty())
+			throw std::out_of_range("List is empty");
 
-		BidirectionalListItem<T>* old = start;
+		BiListItem<T>* old = start;
 
 		start = old->nextValue;
 		start->prevValue = nullptr;
 
 		free(old);
+
+		_size--;
 	}
 
-	void RemoveAt(int index) {
-		BidirectionalListItem<T>* current = elementAt(index);
+	void remove(int index) {
+		BiListItem<T>* current = (begin() + index).node();
+
+		if (current == start) {
+			pop_front();
+			return;
+		}
+		else if (current == stop) {
+			pop_back();
+			return;
+		}
 
 		current->prevValue->nextValue = current->nextValue;
 		current->nextValue->prevValue = current->prevValue;
 
 		free(current);
+
+		_size--;
 	}
 
-	void RemoveFromEnd() {
-		if (stop == nullptr)
-			throw "List is empty";
+	void pop_back() {
+		if (empty())
+			throw std::out_of_range("List is empty");
 
-		BidirectionalListItem<T>* old = stop->prevValue;
+		BiListItem<T>* old = stop->prevValue;
 
 		stop = old->prevValue;
 		stop->nextValue = nullptr;
 
 		free(old);
+
+		_size--;
 	}
 
-	BidirectionalListItem<T>* elementAt(int index) {
-		return *(begin() + index);
-	}
+	BiListItem<T>* findElement(T value) {
+		BiList_iter<T> current = begin();
 
-	BidirectionalListItem<T>* findElement(T value) {
-		BidirectionalListItem_iter<T> current = begin();
-
-		while (*current != nullptr && (*current)->value != value)
+		while (current != nullptr && *current != value)
 			current++;
 
-		return *current;
+		return current.node();
 	}
 
 	void display() {
-		for (BidirectionalListItem_iter<T> it = begin(); *it != nullptr; it++) {
-			std::cout << (*it)->value << " ";
-		}
+		for (int i = 0; i < _size; i++)
+			std::cout << (*this)[i] << " ";
 
 		std::cout << std::endl;
 	}
 
-private:
-	BidirectionalListItem<T>* CreateElement(T value) {
-		BidirectionalListItem<T>* item = new BidirectionalListItem<T>();
+	void assign(int capacity, T value) {
+		for (int i = 0; i < capacity; i++)
+			push_back(std::move(value));
+	}
 
-		item->value = value;
+	void clear() {
+		while (!empty())
+			pop_front();
+	}
 
-		item->nextValue = item->prevValue = nullptr;
-
-		return item;
+	virtual T& operator[](int index) override {
+		BiListItem<T>* temp = start;
+		for (int i = 0; i < index && temp != nullptr; i++) {
+			temp = temp->nextValue;
+		}
+		if (temp == nullptr) {
+			throw std::out_of_range("Index out of range");
+		}
+		return temp->value;
 	}
 };
 
 template <typename T>
-class DeQueue {
+class DeQueue : public Sortable<T> {
+	std::size_t _size = 0;
+
 public:
 	DeQueue() {
-		begin = CreateElement(NULL);
-		stop = CreateElement(NULL);
-
-		begin->nextValue = stop;
-		stop->prevValue = begin;
+		_size = 0;
 	}
 
-	BidirectionalListItem<T>* begin;
-	BidirectionalListItem<T>* stop;
-
-	void InsertIntoStart(T value) {
-		BidirectionalListItem<T>* newValue = CreateElement(value);
-
-		newValue->nextValue = begin->nextValue;
-		newValue->prevValue = begin;
-		begin->nextValue->prevValue = newValue;
-		begin->nextValue = newValue;
+	DeQueue(int capacity) {
+		for (int i = 0; i < capacity; i++)
+			push(T());
 	}
 
-	void InsertIntoEnd(T value) {
-		BidirectionalListItem<T>* newValue = CreateElement(value);
-
-		newValue->prevValue = stop->prevValue;
-		newValue->nextValue = stop;
-		stop->prevValue->nextValue = newValue;
-		stop->prevValue = newValue;
+	DeQueue(int capacity, T value) {
+		assign(capacity, value);
 	}
 
-	T ShiftFromStart() {
-		if (begin->nextValue == stop)
-			return "";
+	BiListItem<T>* start;
+	BiListItem<T>* stop;
 
-		BidirectionalListItem<T>* old = begin->nextValue;
+	bool empty() const { return _size == 0; }
+
+	virtual std::size_t size() override { return _size; }
+
+	BiList_iter<T> begin() { return BiList_iter<T>(start); }
+	BiList_iter<T> end() { return BiList_iter<T>(stop); }
+
+	void push_front(T value) {
+		BiListItem<T>* newValue = new BiListItem<T>(value);
+
+		if (empty()) {
+			start = stop = newValue;
+
+			_size++;
+
+			return;
+		}
+
+		newValue->nextValue = start;
+		start->prevValue = newValue;
+		start = newValue;
+
+		_size++;
+	}
+
+	void push_back(T value) {
+		BiListItem<T>* newValue = new BiListItem<T>(value);
+
+		if (empty()) {
+			start = stop = newValue;
+
+			_size++;
+
+			return;
+		}
+
+		newValue->prevValue = stop;
+		stop->nextValue = newValue;
+		stop = newValue;
+
+		_size++;
+	}
+
+	T shift_front() {
+		if (empty())
+			throw std::out_of_range("Deque is empty");
+
+		BiListItem<T>* old = start->nextValue;
 		T value = old->value;
 
-		begin->nextValue = old->nextValue;
-		begin->nextValue->prevValue = begin;
+		start = start->next;
+		if (start != nullptr)
+			start->prevValue = nullptr;
+		else
+			stop = nullptr;
+
+		_size--;
 
 		free(old);
 
 		return value;
 	}
 
-	T ShiftFromEnd() {
-		if (stop->prevValue == begin)
-			return NULL;
+	T shift_back() {
+		if (empty())
+			throw std::out_of_range("Deque is empty");
 
-		BidirectionalListItem<T>* old = stop->prevValue;
+		BiListItem<T>* old = stop;
 		T value = old->value;
 
-		stop->prevValue = old->prevValue;
-		stop->prevValue->nextValue = stop;
+		stop = stop->prevValue;
+		if (stop != nullptr)
+			stop->nextValue = nullptr;
+		else
+			stop = nullptr;
+
+		_size--;
 
 		free(old);
 
@@ -605,23 +1092,31 @@ public:
 	}
 
 	void display() {
-		BidirectionalListItem<T>* current = begin;
+		for (int i = 0; i < _size; i++)
+			std::cout << (*this)[i] << " ";
 
-		while (current->nextValue != stop) {
-			current = current->nextValue;
-			std::cout << current->value << std::endl;
-		}
+		std::cout << std::endl;
 	}
 
-private:
-	BidirectionalListItem<T>* CreateElement(T value) {
-		BidirectionalListItem<T>* item = new BidirectionalListItem<T>();
+	void assign(int capacity, T value) {
+		for (int i = 0; i < capacity; i++)
+			push_back(std::move(value));
+	}
 
-		item->value = value;
+	void clear() {
+		while (!empty())
+			shift_front();
+	}
 
-		item->nextValue = item->prevValue = nullptr;
-
-		return item;
+	virtual T& operator[](int index) override {
+		BiListItem<T>* temp = start;
+		for (int i = 0; i < index && temp != nullptr; i++) {
+			temp = temp->nextValue;
+		}
+		if (temp == nullptr) {
+			throw std::out_of_range("Index out of range");
+		}
+		return temp->value;
 	}
 };
 
@@ -920,22 +1415,22 @@ private:
 
 		switch (node->value[0])
 		{
-			case '+':
-				return (double)left + (double)right;
-			case '-':
-				return (double)left - (double)right;
-			case '/':
-				return (double)left / (double)right;
-			case '*':
-				return (double)left * (double)right;
-			case '^':
-				return std::pow((double)left, (double)right);
+		case '+':
+			return (double)left + (double)right;
+		case '-':
+			return (double)left - (double)right;
+		case '/':
+			return (double)left / (double)right;
+		case '*':
+			return (double)left * (double)right;
+		case '^':
+			return std::pow((double)left, (double)right);
 
-			default:
-				break;
+		default:
+			break;
 		}
 	}
-		 
+
 public:
 	Math(std::string expr) {
 		root = createExpr(root, expr);

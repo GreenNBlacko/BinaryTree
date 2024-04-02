@@ -14,7 +14,7 @@ enum operations {
 };
 
 int main() {
-	BidirectionalList<int> firstList{};
+	BiList<int> firstList{};
 
 	int val;
 
@@ -28,11 +28,11 @@ int main() {
 
 			switch (selectionMenu("Where do you want to insert", new string[3]{ "At start", "At end", "At i" }, 3)) {
 				case 0:
-					firstList.InsertIntoStart(val);
+					firstList.push_front(val);
 					break;
 
 				case 1:
-					firstList.InsertIntoEnd(val);
+					firstList.push_back(val);
 					break;
 
 				case 2:
@@ -40,7 +40,7 @@ int main() {
 
 					getValue(i, "i");
 
-					firstList.insertAt(i, val);
+					firstList.insert(i, val);
 					break;
 			}
 			break;
@@ -50,11 +50,11 @@ int main() {
 
 			switch (selectionMenu("Where do you want to remove", new string[3]{ "At start", "At end", "At i" }, 3)) {
 			case 0:
-				firstList.RemoveFromStart();
+				firstList.pop_front();
 				break;
 
 			case 1:
-				firstList.RemoveFromEnd();
+				firstList.pop_back();
 				break;
 
 			case 2:
@@ -62,7 +62,7 @@ int main() {
 
 				getValue(i, "i");
 
-				firstList.RemoveAt(i);
+				firstList.remove(i);
 				break;
 			}
 			break;
@@ -76,7 +76,7 @@ int main() {
 		case Search: {
 			cout << endl;
 
-			BidirectionalListItem<int>* item = *firstList.begin();
+			BiListItem<int>* item = firstList.begin().node();
 
 			switch (selectionMenu("How do you want to search", new string[2]{ "By index", "By value" }, 2)) {
 			case 0:
@@ -84,7 +84,7 @@ int main() {
 
 				getValue(i, "i");
 
-				item = firstList.elementAt(i);
+				item = (firstList.begin() + i).node();
 				break;
 
 			case 1:
@@ -106,8 +106,8 @@ int main() {
 
 			CyclicList<int> secondList{};
 
-			for (BidirectionalListItem_iter<int> it = firstList.begin(); *it != nullptr; it++) {
-				secondList.insertAtEnd((*it)->value);
+			for (int i = 0; i < firstList.size(); i++) {
+				secondList.push_back(firstList[i]);
 			}
 
 			cout << "Converted list:\n";

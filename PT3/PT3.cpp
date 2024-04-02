@@ -6,26 +6,26 @@ using namespace std;
 
 int main() {
     int n;
-    OneDirectionalList<int> firstList;
-    BidirectionalList<int> SecondList;
 
     getValue(n, "n");
 
-    for (int i = 0; i < n; i++) {
-        int val;
+    List<int> firstList = List<int>(n);
+    BiList<int> SecondList;
 
-        getValue(val, "element " + to_string(i + 1));
-
-        firstList.insertAtEnd(val);
+    for (int i = 0; i < firstList.size(); i++) {
+        getValue(firstList[i], "element " + to_string(i + 1));
     }
 
-    for (int i = 0; i < n; i++) {
-        int val = firstList.elementAt(i);
-
-        if(SecondList.findElement(val) == nullptr)
-            SecondList.InsertIntoEnd(val);
+    for (int i = 0; i < firstList.size(); i++) {
+        if (SecondList.indexOf(firstList[i]) == -1)
+            SecondList.push_back(firstList[i]);
     }
 
     cout << "Resulting list:\n";
     SecondList.display();
+
+    firstList.quicksort();
+
+    cout << "Sorted list:\n";
+    firstList.display();
 }

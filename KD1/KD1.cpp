@@ -11,7 +11,7 @@ int main()
 		case 0: {
 			int n;
 
-			OneDirectionalList<int> list{};
+			List<int> list{};
 
 			getValue(n, "n");
 
@@ -20,7 +20,7 @@ int main()
 
 				getValue(a, "element " + to_string(i + 1));
 
-				list.insertAtEnd((a % 2 == 0 ? a * 2 : a));
+				list.push_back((a % 2 == 0 ? a * 2 : a));
 			}
 
 			cout << "\nResulting list:\n";
@@ -31,7 +31,7 @@ int main()
 		case 1: {
 			int n, x;
 
-			OneDirectionalList<int> list{};
+			List<int> list{};
 
 			getValue(n, "n");
 
@@ -40,7 +40,7 @@ int main()
 
 				getValue(a, "element " + to_string(i + 1));
 
-				list.insertAtEnd(a);
+				list.push_back(a);
 			}
 
 			int lastEven = -1;
@@ -56,7 +56,7 @@ int main()
 
 			if (lastEven != -1) {
 				getValue(x, "x");
-				list.insertAt(lastEven, x);
+				list.insert(lastEven, x);
 
 				cout << "\nResulting list:\n";
 				list.display();
@@ -67,7 +67,7 @@ int main()
 		case 2: {
 			int n;
 
-			OneDirectionalList<int> list{};
+			List<int> list{};
 
 			getValue(n, "n");
 
@@ -76,7 +76,7 @@ int main()
 
 				getValue(a, "element " + to_string(i + 1));
 
-				list.insertAtEnd(a);
+				list.push_back(a);
 			}
 
 			int _min = 0, _max = 0;
@@ -93,8 +93,8 @@ int main()
 					_min = i;
 			}
 
-			list.removeAt(_min);
-			list.removeAt(_max);
+			list.remove(_min);
+			list.remove(_max);
 
 			cout << "\nResulting list:\n";
 			list.display();
