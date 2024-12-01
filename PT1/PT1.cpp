@@ -22,8 +22,8 @@ int main() {
     
 
     for (int i = 0; i < m; i++) // Sm - S1
-        SecondList.push_front(firstList.elementAt(i));
+        SecondList.push_front(firstList.at(i));
 
     for (int i = m; i < n; i++) // Sm+1 - Sn
-        SecondList.push_front(firstList.elementAt(i));
+        SecondList.push_front(firstList.at(i));
 }

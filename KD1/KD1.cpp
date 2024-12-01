@@ -7,7 +7,7 @@ using namespace std;
 
 int main()
 {
-	switch (selectionMenu("Select which task to run", new string[3]{ "First", "Second", "Third" }, 3)) {
+	switch (selectionMenu("Select which task to run", { "First", "Second", "Third" })) {
 		case 0: {
 			int n;
 
@@ -46,7 +46,7 @@ int main()
 			int lastEven = -1;
 
 			for (int i = 0; i < n; i++) {
-				int value = list.elementAt(i);
+				int value = list.at(i);
 
 				int mod = value % 2;
 
@@ -82,9 +82,9 @@ int main()
 			int _min = 0, _max = 0;
 
 			for (int i = 0; i < n; i++) {
-				int element = list.elementAt(i);
-				int minElement = list.elementAt(_min);
-				int maxElement = list.elementAt(_max);
+				int element = list.at(i);
+				int minElement = list.at(_min);
+				int maxElement = list.at(_max);
 
 				if (element > maxElement)
 					_max = i;
@@ -102,6 +102,6 @@ int main()
 		}
 	}
 
-	if (selectionMenu("Continue?", new string[2]{ "No", "Yes" }, 2) == 1)
+	if (selectionMenu("Continue?", { "No", "Yes" }) == 1)
 		main();
 }

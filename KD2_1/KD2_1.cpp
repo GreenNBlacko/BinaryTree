@@ -22,13 +22,13 @@ int main() {
 
 start:
 
-	switch ((operations)selectionMenu("Select operation", new string[7]{ "Insert", "Remove", "Print", "Search", "Add to stack from max", "Add to stack upto first negative", "Quit"}, 7)) {
+	switch ((operations)selectionMenu("Select operation", { "Insert", "Remove", "Print", "Search", "Add to stack from max", "Add to stack upto first negative", "Quit"})) {
 	case Insert:
 		cout << endl;
 
 		getValue(val, "value");
 
-		switch (selectionMenu("Where do you want to insert", new string[4]{ "At start", "At end", "Before i", "After i"}, 4)) {
+		switch (selectionMenu("Where do you want to insert", { "At start", "At end", "Before i", "After i"})) {
 			case 0:
 				cyclicList.push_front(val);
 				break;
@@ -56,7 +56,7 @@ start:
 	case Remove:
 		cout << endl;
 
-		switch (selectionMenu("Where do you want to remove", new string[2]{ "At start", "At i" }, 2)) {
+		switch (selectionMenu("Where do you want to remove", { "At start", "At i" })) {
 		case 0:
 			cyclicList.pop_front();
 			break;
@@ -80,7 +80,8 @@ start:
 		}
 
 		while (!stack.empty()) {
-			int el = stack.pop();
+			int el = stack.top();
+			stack.pop();
 
 			cout << el << " ";
 		}
@@ -92,7 +93,7 @@ start:
 
 		ListItem<int>* item = cyclicList.begin().node();
 
-		switch (selectionMenu("How do you want to search", new string[4]{ "By index", "By value", "Max value", "Min Value"}, 4)) {
+		switch (selectionMenu("How do you want to search", { "By index", "By value", "Max value", "Min Value"})) {
 			case 0:
 				int i;
 

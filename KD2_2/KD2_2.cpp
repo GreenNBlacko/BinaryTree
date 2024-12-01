@@ -20,13 +20,13 @@ int main() {
 
 start:
 
-	switch ((operations)selectionMenu("Select operation", new string[6]{ "Insert", "Remove", "Print", "Search", "Convert", "Quit" }, 6)) {
+	switch ((operations)selectionMenu("Select operation", List<string>{ "Insert", "Remove", "Print", "Search", "Convert", "Quit" })) {
 	case Insert:
 		cout << endl;
 
 		getValue(val, "value");
 
-		switch (selectionMenu("Where do you want to insert", new string[4]{ "At start", "At end", "Before i", "After i" }, 4)) {
+		switch (selectionMenu("Where do you want to insert", List<string>{ "At start", "At end", "Before i", "After i" })) {
 		case 0:
 			firstList.push_front(val);
 			break;
@@ -54,7 +54,7 @@ start:
 	case Remove:
 		cout << endl;
 
-		switch (selectionMenu("Where do you want to remove", new string[2]{ "At start", "At i" }, 2)) {
+		switch (selectionMenu("Where do you want to remove", List<string>{ "At start", "At i" })) {
 			case 0:
 				firstList.pop_front();
 				break;
@@ -80,7 +80,7 @@ start:
 
 		ListItem<int>* item = firstList.begin().node();
 
-		switch (selectionMenu("How do you want to search", new string[4]{ "By index", "By value", "Max value", "Min Value" }, 4)) {
+		switch (selectionMenu("How do you want to search", List<string>{ "By index", "By value", "Max value", "Min Value" })) {
 			case 0:
 				int i;
 

@@ -24,7 +24,7 @@ int main() {
     cout << "Resulting list:\n";
     SecondList.display();
 
-    firstList.quicksort();
+    firstList.quickSort();
 
     cout << "Sorted list:\n";
     firstList.display();

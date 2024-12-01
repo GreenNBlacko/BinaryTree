@@ -20,13 +20,13 @@ int main() {
 
 	start:
 
-	switch ((operations)selectionMenu("Select operation", new string[6]{ "Insert", "Remove", "Print", "Search", "Convert", "Quit"}, 6)) {
+	switch ((operations)selectionMenu("Select operation", { "Insert", "Remove", "Print", "Search", "Convert", "Quit"})) {
 		case Insert:
 			cout << endl;
 
 			getValue(val, "value");
 
-			switch (selectionMenu("Where do you want to insert", new string[3]{ "At start", "At end", "At i" }, 3)) {
+			switch (selectionMenu("Where do you want to insert", { "At start", "At end", "At i" })) {
 				case 0:
 					firstList.push_front(val);
 					break;
@@ -48,7 +48,7 @@ int main() {
 		case Remove:
 			cout << endl;
 
-			switch (selectionMenu("Where do you want to remove", new string[3]{ "At start", "At end", "At i" }, 3)) {
+			switch (selectionMenu("Where do you want to remove", { "At start", "At end", "At i" })) {
 			case 0:
 				firstList.pop_front();
 				break;
@@ -78,7 +78,7 @@ int main() {
 
 			BiListItem<int>* item = firstList.begin().node();
 
-			switch (selectionMenu("How do you want to search", new string[2]{ "By index", "By value" }, 2)) {
+			switch (selectionMenu("How do you want to search", { "By index", "By value" })) {
 			case 0:
 				int i;
 

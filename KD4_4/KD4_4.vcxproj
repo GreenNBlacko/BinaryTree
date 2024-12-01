@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{9903cdac-521a-4cb8-93ca-5acb806398ac}</ProjectGuid>
-    <RootNamespace>PT2</RootNamespace>
+    <ProjectGuid>{fb24e1dc-367e-4e9e-887a-ed239793509d}</ProjectGuid>
+    <RootNamespace>KD44</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -128,7 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="PT2.cpp" />
+    <ClCompile Include="KD4_4.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
